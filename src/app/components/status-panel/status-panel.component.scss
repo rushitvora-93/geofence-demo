@@ -1,0 +1,263 @@
+.panel {
+  width: 320px;
+  min-width: 320px;
+  height: 100%;
+  overflow-y: auto;
+  background: #0f172a;
+  border-right: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────
+.panel__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1e293b;
+
+  .logo {
+    font-size: 1.8rem;
+    color: #818cf8;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: -0.02em;
+  }
+
+  small {
+    font-size: 0.65rem;
+    color: #475569;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+// ── Cards ─────────────────────────────────────────────────────────────────
+.card {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+  margin: 0;
+}
+
+// ── Status card ───────────────────────────────────────────────────────────
+.status-card {
+  transition: background 0.3s ease;
+
+  &.status--inside {
+    background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+    border: 1px solid #22c55e40;
+  }
+
+  &.status--outside {
+    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+    border: 1px solid #ef444440;
+  }
+
+  &.status--unknown {
+    background: #1e293b;
+    border: 1px solid #334155;
+  }
+
+  .status-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .distance {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+}
+
+// ── GPS row ───────────────────────────────────────────────────────────────
+.gps-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pos-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.coord {
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accuracy {
+  font-size: 0.65rem;
+  color: #475569;
+}
+
+.error-msg {
+  font-size: 0.75rem;
+  color: #fca5a5;
+  background: #450a0a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin: 0;
+}
+
+.hint {
+  font-size: 0.7rem;
+  color: #475569;
+  margin: 0;
+  font-style: italic;
+}
+
+// ── Form ──────────────────────────────────────────────────────────────────
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+
+  input {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #e2e8f0;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #6366f1;
+    }
+  }
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────
+.btn {
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 7px 12px;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+
+  &:hover { opacity: 0.85; }
+  &:active { transform: scale(0.97); }
+
+  &--primary {
+    background: #4f46e5;
+    color: #fff;
+  }
+
+  &--danger {
+    background: #dc2626;
+    color: #fff;
+  }
+
+  &--block {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+// ── Event card ────────────────────────────────────────────────────────────
+.event-card {
+  border: 1px solid #312e81;
+  background: #1e1b4b;
+
+  .event-dir {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .event-meta {
+    font-size: 0.72rem;
+    color: #818cf8;
+    margin: 0;
+  }
+
+  .event-api-note {
+    font-size: 0.65rem;
+    color: #475569;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+// ── History ───────────────────────────────────────────────────────────────
+.history-card {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #0f172a;
+
+  &--entered { border-left: 2px solid #22c55e; }
+  &--exited  { border-left: 2px solid #ef4444; }
+
+  .history-time { color: #94a3b8; }
+  .history-dist { color: #475569; margin-left: auto; }
+}

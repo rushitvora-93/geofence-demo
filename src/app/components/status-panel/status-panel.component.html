@@ -1,0 +1,117 @@
+<aside class="panel">
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="panel__header">
+    <span class="logo">⬡</span>
+    <h1>Geofence Demo</h1>
+    <small>Angular 21 · Zoneless · Signals</small>
+  </header>
+
+  <!-- ── Status badge ───────────────────────────────────────────────────── -->
+  <section class="card status-card" [class]="'status--' + statusClass()">
+    <p class="label">Fence Status</p>
+    <p class="status-value">{{ statusLabel() }}</p>
+    <p class="distance">{{ distanceDisplay() }} from center</p>
+  </section>
+
+  <!-- ── GPS controls ───────────────────────────────────────────────────── -->
+  <section class="card">
+    <p class="label">Location Source</p>
+
+    @if (geo.state() === 'error' || geo.state() === 'denied') {
+      <p class="error-msg">⚠️ {{ geo.errorMessage() }}</p>
+    }
+
+    <div class="gps-row">
+      <div class="pos-info">
+        <span class="coord">{{ posDisplay() }}</span>
+        @if (accuracyDisplay()) {
+          <span class="accuracy">{{ accuracyDisplay() }}</span>
+        }
+      </div>
+
+      @if (!geo.isWatching()) {
+        <button class="btn btn--primary" (click)="startGps()">
+          📡 Start GPS
+        </button>
+      } @else {
+        <button class="btn btn--danger" (click)="stopGps()">
+          ⏹ Stop GPS
+        </button>
+      }
+    </div>
+
+    @if (!geo.isWatching()) {
+      <p class="hint">Or click the map to simulate a position.</p>
+    }
+  </section>
+
+  <!-- ── Geofence config form ───────────────────────────────────────────── -->
+  <section class="card">
+    <p class="label">Geofence Config</p>
+
+    <div class="form-grid">
+      <label class="field">
+        <span>Center Lat</span>
+        <input
+          type="number"
+          step="0.0001"
+          [ngModel]="formLat()"
+          (ngModelChange)="formLat.set($event)"
+        />
+      </label>
+
+      <label class="field">
+        <span>Center Lng</span>
+        <input
+          type="number"
+          step="0.0001"
+          [ngModel]="formLng()"
+          (ngModelChange)="formLng.set($event)"
+        />
+      </label>
+
+      <label class="field field--full">
+        <span>Radius (metres)</span>
+        <input
+          type="number"
+          min="50"
+          step="50"
+          [ngModel]="formRadius()"
+          (ngModelChange)="formRadius.set($event)"
+        />
+      </label>
+    </div>
+
+    <button class="btn btn--primary btn--block" (click)="applyConfig()">
+      Apply Config
+    </button>
+
+    <p class="hint">Tip: drag the map pin to reposition the fence center.</p>
+  </section>
+
+  <!-- ── Last cross event ───────────────────────────────────────────────── -->
+  @if (lastEventDisplay(); as ev) {
+    <section class="card event-card">
+      <p class="label">Last Boundary Cross</p>
+      <p class="event-dir">{{ ev.direction }}</p>
+      <p class="event-meta">{{ ev.time }} · {{ ev.dist }}</p>
+      <p class="event-api-note">📤 Payload logged to console (mock API)</p>
+    </section>
+  }
+
+  <!-- ── Event history ──────────────────────────────────────────────────── -->
+  @if (geofence.eventHistory().length > 0) {
+    <section class="card history-card">
+      <p class="label">Event History</p>
+      <ul class="history-list">
+        @for (ev of geofence.eventHistory(); track ev.timestamp) {
+          <li [class]="'history-item history-item--' + ev.direction">
+            <span>{{ ev.direction === 'entered' ? '➡️' : '⬅️' }}</span>
+            <span class="history-time">{{ ev.timestamp | date: 'HH:mm:ss' }}</span>
+            <span class="history-dist">{{ ev.distanceMeters.toFixed(0) }}m</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</aside>
