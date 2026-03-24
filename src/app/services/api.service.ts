@@ -1,22 +1,56 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { EMPTY, catchError, retry } from 'rxjs';
 import { GeofenceCrossEvent, GeofenceConfig, GeofenceEventPayload } from '../models/geofence.model';
 
-const ENDPOINT = '/api/geofence-event'; // POST endpoint — swap for real URL
+export interface Asset {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  company: string;
+  position: { lat: number; lng: number };
+  status: 'inside' | 'outside';
+  lastSeen: string;
+}
+
+export interface AssetsResponse {
+  assets: Asset[];
+  count: number;
+  source: string;
+}
+
+export interface GeofenceEventsResponse {
+  events: (GeofenceEventPayload & { id: string; receivedAt: string })[];
+  count: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  /**
-   * Called on every boundary cross.
-   *
-   * Integration note:
-   *   Real backend → replace console.log with:
-   *     this.http.post<void>(ENDPOINT, payload).subscribe()
-   *
-   *   Payload shape matches GeofenceEventPayload so the backend can:
-   *     • Store event in DB (event + coords + radius + timestamp)
-   *     • Trigger push notification / webhook
-   *     • Feed a real-time dashboard via SSE/WebSocket
-   */
+  private readonly http = inject(HttpClient);
+
+  /** Fetch tracked assets from the Node.js backend (sourced from JSONPlaceholder). */
+  getAssets() {
+    return this.http.get<AssetsResponse>('/api/assets').pipe(
+      retry({ count: 2, delay: 1000 }),
+      catchError((err) => {
+        console.error('[Geofence API] Failed to load assets:', err);
+        return EMPTY;
+      }),
+    );
+  }
+
+  /** Fetch all stored crossing events from the backend. */
+  getCrossingEvents() {
+    return this.http.get<GeofenceEventsResponse>('/api/geofence-events').pipe(
+      catchError((err) => {
+        console.error('[Geofence API] Failed to load events:', err);
+        return EMPTY;
+      }),
+    );
+  }
+
+  /** Called on every boundary cross — POSTs to the Node.js backend. */
   reportCrossing(event: GeofenceCrossEvent, config: GeofenceConfig): void {
     const payload: GeofenceEventPayload = {
       event: event.direction,
@@ -29,24 +63,17 @@ export class ApiService {
       timestamp: new Date(event.timestamp).toISOString(),
     };
 
-    // 🔔 Mock API call — in production replace with HttpClient.post()
-    console.group(`%c[Geofence API] POST ${ENDPOINT}`, 'color: #6366f1; font-weight: bold');
-    console.log('Payload:', payload);
-    console.groupEnd();
-
-    /*
-     * ── Backend integration (uncomment & inject HttpClient) ───────────────
-     *
-     * this.http
-     *   .post<{ id: string }>(ENDPOINT, payload)
-     *   .pipe(
-     *     retry({ count: 2, delay: 1000 }),
-     *     catchError((err) => {
-     *       console.error('[Geofence API] Failed to report crossing:', err);
-     *       return EMPTY;
-     *     }),
-     *   )
-     *   .subscribe((res) => console.log('[Geofence API] Acknowledged:', res.id));
-     */
+    this.http
+      .post<{ id: string; acknowledged: boolean }>('/api/geofence-event', payload)
+      .pipe(
+        retry({ count: 2, delay: 1000 }),
+        catchError((err) => {
+          console.error('[Geofence API] Failed to report crossing:', err);
+          return EMPTY;
+        }),
+      )
+      .subscribe((res) => {
+        console.log(`[Geofence API] Crossing acknowledged — id: ${res.id}`);
+      });
   }
 }

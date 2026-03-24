@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -9,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GeofenceService } from '../../services/geofence.service';
 import { GeolocationService } from '../../services/geolocation.service';
+import { ApiService, Asset, AssetsResponse, GeofenceEventsResponse } from '../../services/api.service';
 
 @Component({
   selector: 'app-status-panel',
@@ -21,11 +23,17 @@ import { GeolocationService } from '../../services/geolocation.service';
 export class StatusPanelComponent {
   readonly geofence = inject(GeofenceService);
   readonly geo = inject(GeolocationService);
+  private readonly api = inject(ApiService);
 
-  // ── Local form signals (no FormGroup needed — signals-first) ──────────────
+  // ── Local form signals ─────────────────────────────────────────────────────
   readonly formLat = signal('51.505');
   readonly formLng = signal('-0.09');
   readonly formRadius = signal('500');
+
+  // ── Backend data signals ───────────────────────────────────────────────────
+  readonly assetsData = signal<AssetsResponse | null>(null);
+  readonly backendEvents = signal<GeofenceEventsResponse | null>(null);
+  readonly assetsLoading = signal(true);
 
   // ── Derived display values ─────────────────────────────────────────────────
   readonly statusLabel = computed(() => {
@@ -59,6 +67,28 @@ export class StatusPanelComponent {
       dist: `${e.distanceMeters.toFixed(0)} m from center`,
     };
   });
+
+  constructor() {
+    // Load assets once on init
+    this.api.getAssets().subscribe((res) => {
+      this.assetsData.set(res);
+      this.assetsLoading.set(false);
+    });
+
+    // Runs immediately (initial load) and again on every new crossing
+    effect(() => {
+      this.geofence.lastEvent(); // tracked dependency
+      this.loadBackendEvents();
+    });
+  }
+
+  private loadBackendEvents(): void {
+    this.api.getCrossingEvents().subscribe((res) => this.backendEvents.set(res));
+  }
+
+  trackAsset(_: number, asset: Asset) {
+    return asset.id;
+  }
 
   // ── Actions ───────────────────────────────────────────────────────────────
   applyConfig(): void {

@@ -1,17 +1,33 @@
+// ── Scrollbar utility ──────────────────────────────────────────────────────
+@mixin dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+    &:hover { background: #475569; }
+  }
+}
+
+// ── Panel shell ────────────────────────────────────────────────────────────
 .panel {
-  width: 320px;
-  min-width: 320px;
+  width: 340px;
+  min-width: 340px;
   height: 100%;
   overflow-y: auto;
   background: #0f172a;
   border-right: 1px solid #1e293b;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 10px;
+  padding: 14px;
   box-sizing: border-box;
   color: #e2e8f0;
   font-family: 'Inter', system-ui, sans-serif;
+  @include dark-scrollbar;
 }
 
 // ── Header ────────────────────────────────────────────────────────────────
@@ -20,11 +36,12 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #1e293b;
 
   .logo {
     font-size: 1.8rem;
+    line-height: 1;
     color: #818cf8;
   }
 
@@ -37,7 +54,7 @@
   }
 
   small {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: #475569;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -47,49 +64,72 @@
 // ── Cards ─────────────────────────────────────────────────────────────────
 .card {
   background: #1e293b;
+  border: 1px solid #263347;
   border-radius: 10px;
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
+// ── Label row (shared across all cards) ───────────────────────────────────
 .label {
-  font-size: 0.65rem;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #64748b;
   margin: 0;
 }
 
+// ── Badge ─────────────────────────────────────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #312e81;
+  color: #a5b4fc;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 7px;
+  margin-left: 8px;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
 // ── Status card ───────────────────────────────────────────────────────────
 .status-card {
-  transition: background 0.3s ease;
+  transition: background 0.35s ease, border-color 0.35s ease;
+  border-color: #263347;
 
   &.status--inside {
     background: linear-gradient(135deg, #14532d 0%, #166534 100%);
-    border: 1px solid #22c55e40;
+    border-color: #22c55e40;
   }
 
   &.status--outside {
     background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
-    border: 1px solid #ef444440;
+    border-color: #ef444440;
   }
 
   &.status--unknown {
     background: #1e293b;
-    border: 1px solid #334155;
   }
 
   .status-value {
     font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
+    line-height: 1.2;
   }
 
   .distance {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: #94a3b8;
     margin: 0;
   }
@@ -111,8 +151,8 @@
 }
 
 .coord {
-  font-size: 0.75rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
   color: #94a3b8;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -120,24 +160,26 @@
 }
 
 .accuracy {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   color: #475569;
 }
 
 .error-msg {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   color: #fca5a5;
   background: #450a0a;
+  border: 1px solid #7f1d1d;
   border-radius: 6px;
   padding: 6px 10px;
   margin: 0;
 }
 
 .hint {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: #475569;
   margin: 0;
   font-style: italic;
+  line-height: 1.4;
 }
 
 // ── Form ──────────────────────────────────────────────────────────────────
@@ -151,13 +193,12 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: #64748b;
   font-weight: 600;
+  letter-spacing: 0.03em;
 
-  &--full {
-    grid-column: 1 / -1;
-  }
+  &--full { grid-column: 1 / -1; }
 
   input {
     background: #0f172a;
@@ -165,14 +206,21 @@
     border-radius: 6px;
     color: #e2e8f0;
     padding: 6px 8px;
-    font-size: 0.8rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
 
     &:focus {
       border-color: #6366f1;
+      box-shadow: 0 0 0 2px #6366f120;
     }
+
+    // Hide number spinners — they look odd in dark theme
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button { opacity: 0.3; }
   }
 }
 
@@ -181,23 +229,26 @@
   border: none;
   border-radius: 7px;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 600;
   padding: 7px 12px;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
   white-space: nowrap;
+  font-family: inherit;
 
-  &:hover { opacity: 0.85; }
+  &:hover  { opacity: 0.88; }
   &:active { transform: scale(0.97); }
 
   &--primary {
     background: #4f46e5;
     color: #fff;
+    &:hover { box-shadow: 0 2px 8px #4f46e540; }
   }
 
   &--danger {
     background: #dc2626;
     color: #fff;
+    &:hover { box-shadow: 0 2px 8px #dc262640; }
   }
 
   &--block {
@@ -208,24 +259,24 @@
 
 // ── Event card ────────────────────────────────────────────────────────────
 .event-card {
-  border: 1px solid #312e81;
+  border-color: #312e81;
   background: #1e1b4b;
 
   .event-dir {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     margin: 0;
   }
 
   .event-meta {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: #818cf8;
     margin: 0;
   }
 
   .event-api-note {
-    font-size: 0.65rem;
-    color: #475569;
+    font-size: 0.63rem;
+    color: #4338ca;
     margin: 0;
     font-style: italic;
   }
@@ -233,8 +284,7 @@
 
 // ── History ───────────────────────────────────────────────────────────────
 .history-card {
-  max-height: 180px;
-  overflow-y: auto;
+  // No max-height here — let the outer panel scroll naturally
 }
 
 .history-list {
@@ -243,7 +293,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .history-item {
@@ -251,13 +301,102 @@
   align-items: center;
   gap: 8px;
   font-size: 0.7rem;
-  padding: 4px 8px;
-  border-radius: 5px;
+  padding: 5px 8px;
+  border-radius: 6px;
   background: #0f172a;
+  border: 1px solid transparent;
+  transition: border-color 0.15s;
 
-  &--entered { border-left: 2px solid #22c55e; }
-  &--exited  { border-left: 2px solid #ef4444; }
+  &--entered {
+    border-left: 3px solid #22c55e;
+    &:hover { border-color: #22c55e30; }
+  }
 
-  .history-time { color: #94a3b8; }
-  .history-dist { color: #475569; margin-left: auto; }
+  &--exited {
+    border-left: 3px solid #ef4444;
+    &:hover { border-color: #ef444430; }
+  }
+
+  .history-time { color: #64748b; }
+  .history-dist { color: #475569; margin-left: auto; font-family: monospace; }
+}
+
+// ── Assets ────────────────────────────────────────────────────────────────
+.assets-source {
+  font-size: 0.6rem;
+  color: #334155;
+  font-style: italic;
+  margin: 0;
+}
+
+.assets-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.asset-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: #0f172a;
+  border: 1px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    background: #111827;
+    border-color: #1e293b;
+  }
+}
+
+.asset-avatar {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #312e81, #4c1d95);
+  color: #c4b5fd;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.asset-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 1px;
+}
+
+.asset-name {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.asset-company {
+  font-size: 0.6rem;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.asset-status {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  line-height: 1;
 }

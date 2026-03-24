@@ -95,14 +95,37 @@
       <p class="label">Last Boundary Cross</p>
       <p class="event-dir">{{ ev.direction }}</p>
       <p class="event-meta">{{ ev.time }} · {{ ev.dist }}</p>
-      <p class="event-api-note">📤 Payload logged to console (mock API)</p>
+      <p class="event-api-note">📤 Sent to Node.js backend</p>
     </section>
   }
 
-  <!-- ── Event history ──────────────────────────────────────────────────── -->
+  <!-- ── Backend crossing events ────────────────────────────────────────── -->
+  @if (backendEvents(); as be) {
+    <section class="card history-card">
+      <p class="label">
+        Backend Events
+        <span class="badge">{{ be.count }}</span>
+      </p>
+      @if (be.count === 0) {
+        <p class="hint">No crossings recorded yet — click around the map.</p>
+      } @else {
+        <ul class="history-list">
+          @for (ev of be.events; track ev.id) {
+            <li [class]="'history-item history-item--' + ev.event">
+              <span>{{ ev.event === 'entered' ? '➡️' : '⬅️' }}</span>
+              <span class="history-time">{{ ev.timestamp | date: 'HH:mm:ss' }}</span>
+              <span class="history-dist">{{ ev.distanceMeters }}m</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <!-- ── Local event history ────────────────────────────────────────────── -->
   @if (geofence.eventHistory().length > 0) {
     <section class="card history-card">
-      <p class="label">Event History</p>
+      <p class="label">Local Session History</p>
       <ul class="history-list">
         @for (ev of geofence.eventHistory(); track ev.timestamp) {
           <li [class]="'history-item history-item--' + ev.direction">
@@ -114,4 +137,36 @@
       </ul>
     </section>
   }
+
+  <!-- ── Tracked assets from backend ───────────────────────────────────── -->
+  <section class="card assets-card">
+    <p class="label">
+      Tracked Assets
+      @if (assetsData(); as ad) {
+        <span class="badge">{{ ad.count }}</span>
+      }
+    </p>
+
+    @if (assetsLoading()) {
+      <p class="hint">Loading assets from backend…</p>
+    } @else if (assetsData(); as ad) {
+      <p class="assets-source">Source: {{ ad.source }}</p>
+      <ul class="assets-list">
+        @for (asset of ad.assets; track asset.id; let i = $index) {
+          <li class="asset-item">
+            <span class="asset-avatar">{{ asset.name[0] }}</span>
+            <div class="asset-info">
+              <span class="asset-name">{{ asset.name }}</span>
+              <span class="asset-company">{{ asset.company }}</span>
+            </div>
+            <span class="asset-status" [class]="'asset-status--' + asset.status">
+              {{ asset.status === 'inside' ? '✅' : '🔴' }}
+            </span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="error-msg">⚠️ Could not load assets — is the backend running?</p>
+    }
+  </section>
 </aside>
